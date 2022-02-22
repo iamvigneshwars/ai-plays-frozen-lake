@@ -32,6 +32,8 @@ for episode in range(num_episodes):
 
     for step in range(max_steps_per_episode):
         exploration_threshold = random.uniform(0, 1)
+        # If the exploration rate is greater than the threshold,
+        # exploit the available information about the environment.
         if exploration_threshold > exploration_rate:
             action = np.argmax(q_table[state, :])
 
@@ -39,6 +41,7 @@ for episode in range(num_episodes):
             action = env.action_space.sample()
 
         new_state, reward, done, info = env.step(action)
+        # Calculate the new q value for current state, action pair.
         q_table[state, action] = q_table[state, action] * (1 - learning_rate) + learning_rate * (reward + discount_rate * np.max(q_table[new_state, :])) 
         state = new_state
         episode_reward += reward
@@ -46,43 +49,41 @@ for episode in range(num_episodes):
         if done == True:
             break
 
+    # Decay exploration rate
     exploration_rate = min_exploration + (max_exploration - min_exploration) * np.exp(-exploration_decay*episode)
     rewards.append(episode_reward)
 
-
-    # print("***Average rewards per thousand episodes")
     if episode > 0 and episode % 1000 == 0:
-        print(episode, ": ", sum(rewards[-1000:])/1000)
+        print("***Average rewared after ",episode, " episodes : ", sum(rewards[-1000:])/1000, "***")
 
-# for episode in range(3):
-#     # initialize new episode params
-#     state = env.reset()
-#     done = False
-#     time.sleep(1)
+for episode in range(3):
+    # Reset the environment to play the game.
+    state = env.reset()
+    done = False
 
-#     for step in range(max_steps_per_episode):        
-#         # Show current state of environment on screen
-#         # Choose action with highest Q-value for current state       
-#         # Take new action
-#         env.render()
-#         time.sleep(0.3)
-#         action = np.argmax(q_table[state,:])        
-#         new_state, reward, done, info = env.step(action)
+    for step in range(max_steps_per_episode):        
+        env.render()
+        time.sleep(0.3)
+        # Select the best action for the current state.
+        action = np.argmax(q_table[state,:])        
+        new_state, reward, done, info = env.step(action)
 
-#         if done:
-#             env.render()
-#             if reward == 1:
-#                 # Agent reached the goal and won episode
-#                 print("***Goal Reached!***")
-#                 time.sleep(3)
-#                 break
-#             else:
-#                 # Agent stepped in a hole and lost episode     
-#                 print("***Agent fell into the hole***")
-#                 time.sleep(3)
-#                 break
+        if done:
+            env.render()
+            if reward == 1:
+                # If the agent reached the goal
+                print("***Episode :",episode,"***")
+                print("***Goal Reached!***")
+                time.sleep(2)
+                break
+            else:
+                # If the agent stepping onto the hole.
+                print("***Episode :",episode,"***")
+                print("***Agent fell into the hole***")
+                time.sleep(2)
+                break
 
-#         # Set new state
-#         state = new_state
+        # Set new state
+        state = new_state
 
 env.close()
