@@ -13,7 +13,7 @@ action_space_size = env.action_space.n
 state_space_size = env.observation_space.n
 q_table= np.zeros((state_space_size, action_space_size))
 num_episodes = 10000
-max_steps_per_episode = 100
+max_steps_per_episode = 1000
 
 learning_rate = 0.1
 discount_rate = 0.99
@@ -23,8 +23,8 @@ max_exploration = 1
 min_exploration = 0.01
 exploration_decay = 0.001
 
+# Total rewards
 rewards = []
-
 for episode in range(num_episodes):
     state = env.reset()
     done = False
@@ -56,34 +56,34 @@ for episode in range(num_episodes):
     if episode > 0 and episode % 1000 == 0:
         print("***Average rewared after ",episode, " episodes : ", sum(rewards[-1000:])/1000, "***")
 
-for episode in range(3):
-    # Reset the environment to play the game.
-    state = env.reset()
-    done = False
+# for episode in range(3):
+#     # Reset the environment to play the game.
+#     state = env.reset()
+#     done = False
 
-    for step in range(max_steps_per_episode):        
-        env.render()
-        time.sleep(0.3)
-        # Select the best action for the current state.
-        action = np.argmax(q_table[state,:])        
-        new_state, reward, done, info = env.step(action)
+#     for step in range(max_steps_per_episode):        
+#         env.render()
+#         time.sleep(0.3)
+#         # Select the best action for the current state.
+#         action = np.argmax(q_table[state,:])        
+#         new_state, reward, done, info = env.step(action)
 
-        if done:
-            env.render()
-            if reward == 1:
-                # If the agent reached the goal
-                print("***Episode :",episode,"***")
-                print("***Goal Reached!***")
-                time.sleep(2)
-                break
-            else:
-                # If the agent stepping onto the hole.
-                print("***Episode :",episode,"***")
-                print("***Agent fell into the hole***")
-                time.sleep(2)
-                break
+#         if done:
+#             env.render()
+#             if reward == 1:
+#                 # If the agent reached the goal
+#                 print("Episode :",episode)
+#                 print("***Goal Reached!***")
+#                 time.sleep(2)
+#                 break
+#             else:
+#                 # If the agent stepping onto the hole.
+#                 print("Episode :",episode)
+#                 print("***Agent fell into the hole***")
+#                 time.sleep(2)
+#                 break
 
-        # Set new state
-        state = new_state
+#         # Set new state
+#         state = new_state
 
 env.close()
